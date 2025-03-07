@@ -1,0 +1,26 @@
+steps:
+  # Baixar e instalar o Terragrunt
+  - name: 'gcr.io/cloud-builders/wget'
+    args: ['https://github.com/gruntwork-io/terragrunt/releases/download/v0.45.0/terragrunt_linux_amd64', '-O', '/workspace/terragrunt']
+  
+  - name: 'ubuntu'
+    args: ['chmod', '+x', '/workspace/terragrunt']
+  
+  - name: 'ubuntu'
+    args: ['mv', '/workspace/terragrunt', '/usr/local/bin/terragrunt']
+  
+  # Executar Terragrunt
+  - name: 'hashicorp/terraform:1.6'
+    entrypoint: 'sh'
+    args: 
+      - '-c'
+      - |
+        terragrunt init
+        terragrunt apply -auto-approve \
+          -var="project_id=compwire-interno" \
+          -var="region=${_REGION}" \
+          -var="service_name=hello-world-${_RUNTIME}"
+
+substitutions:
+  _REGION: 'us-central1'
+  _RUNTIME: 'go'
